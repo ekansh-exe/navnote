@@ -146,7 +146,7 @@ Plain Markdown. Open them in Neovim, VS Code, Obsidian — whatever you want. Na
 Issues and PRs are welcome. For big changes, open an issue first so we can talk about it.
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/navnote.git
+git clone https://github.com/ekansh-exe/navnote.git
 cd navnote
 make run   # start hacking
 ```
