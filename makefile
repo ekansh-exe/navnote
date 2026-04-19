@@ -1,5 +1,13 @@
 build:
 	go build -o navnote .
 
-run: build
-	./navnote
+run:
+	go run .
+
+install:
+	go install .
+
+clean:
+	rm -f navnote
+
+.PHONY: build run install clean
