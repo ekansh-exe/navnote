@@ -44,6 +44,8 @@ No accounts. No subscriptions. No Electron. Just your terminal and your thoughts
 
 ## Installation
 
+> ⚠️ **Make sure you have Go 1.21+ installed first** — https://go.dev/doc/install
+
 ### Option 1 — `go install` (recommended, no cloning needed)
 
 ```bash
