@@ -107,6 +107,7 @@ make install    # install globally via go install
 | `Ctrl+S` | Save the current note |
 | `Esc` | Go back / cancel current action |
 | `Ctrl+C` or `q` | Quit |
+| `Ctrl+D` | Permanently delete the selected file after confirmation|
 
 > **Tip:** In the list view, just start typing to fuzzy-filter your notes by name.
 
