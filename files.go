@@ -49,3 +49,9 @@ func listFiles() []list.Item {
 	return items
 
 }
+
+// deleteFile removes a note permanently
+func deleteFile(filename string) error {
+	filepath := fmt.Sprintf("%s/%s", vaultDir, filename)
+	return os.Remove(filepath)
+}

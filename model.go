@@ -35,6 +35,7 @@ type model struct {
 	noteTextArea           textarea.Model
 	list                   list.Model
 	showingList            bool
+	confirmingDelete       bool //Adding the field for deleting the file
 }
 
 // Init satisfies the tea.Model interface; no startup commands needed.
@@ -73,6 +74,9 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				}
 
 				m.showingList = false
+			}
+			if m.confirmingDelete {
+				m.confirmingDelete = false
 			}
 
 			return m, nil
@@ -113,6 +117,35 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			m.currentFile = nil
 			m.noteTextArea.SetValue("")
 
+			return m, nil
+		case "ctrl+d":
+			// Only allow delete when browsing the list
+			if m.showingList {
+				m.confirmingDelete = true
+			}
+			return m, nil
+
+		case "y":
+			// Confirm deletion when the prompt is showing
+			if m.confirmingDelete {
+				selected, ok := m.list.SelectedItem().(item)
+				if ok {
+					if err := deleteFile(selected.title); err != nil {
+						log.Printf("Error deleting file: %v", err)
+					} else {
+						// Refresh the list after deletion
+						m.list.SetItems(listFiles())
+					}
+				}
+				m.confirmingDelete = false
+			}
+			return m, nil
+
+		case "n":
+			// Cancel deletion
+			if m.confirmingDelete {
+				m.confirmingDelete = false
+			}
 			return m, nil
 
 		case "enter":
@@ -195,9 +228,9 @@ func (m model) View() string {
 		PaddingRight(2)
 
 	// 🌿 Bulbasaur is the best. No notes app will convince me otherwise.
-	welcome := style.Render("Welcome to NavNote 🌿  [ Inspired by Bulbasaur!(Hey it's my favourite pokemon) ]")
+	welcome := style.Render("Welcome to NavNote 🌿  [ Inspired by Bulbasaur!(Hey ! it's my favourite pokemon) ]")
 
-	help := "Ctrl+N: new file · Ctrl+L: list · Esc: back · Ctrl+S: save · Ctrl+Q: quit"
+	//help := "Ctrl+N: new file · Ctrl+L: list · Esc: back · Ctrl+S: save · Ctrl+Q: quit"
 
 	view := ""
 	if m.createFileInputVisible {
@@ -211,8 +244,17 @@ func (m model) View() string {
 	if m.showingList {
 		view = m.list.View()
 	}
+	confirmPrompt := ""
+	if m.confirmingDelete {
+		selected, ok := m.list.SelectedItem().(item)
+		if ok {
+			confirmPrompt = fmt.Sprintf("\n  ⚠️  Delete \"%s\"? (y / n)", selected.title)
+		}
+	}
 
-	return fmt.Sprintf("\n%s\n\n%s\n\n%s", welcome, view, help)
+	help := "Ctrl+N: new · Ctrl+L: list · Ctrl+D: delete · Esc: back · Ctrl+S: save · Ctrl+Q: quit"
+
+	return fmt.Sprintf("\n%s\n\n%s%s\n\n%s", welcome, view, confirmPrompt, help)
 }
 
 func initializeModel() model {
